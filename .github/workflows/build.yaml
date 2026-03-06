@@ -27,8 +27,9 @@ jobs:
         run: |
           export PATH=$HOME/.local/bin:$PATH
           mkdir -p /home/runner/pmos-work
+          mkdir -p /home/runner/pmaports
           cd pmbootstrap
-          printf "edge\nsamsung\na2corelte\nstable\nuser\n\n" | ./pmbootstrap.py -w /home/runner/pmos-work init
+          printf "/home/runner/pmos-work\n/home/runner/pmaports\nedge\nsamsung\na2corelte\nstable\nuser\n\n" | ./pmbootstrap.py init
 
       - name: Configure device
         run: |
