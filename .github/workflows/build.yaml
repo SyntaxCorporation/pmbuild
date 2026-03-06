@@ -1,45 +1,48 @@
-name: Build postmarketOS Image
+name: Build postmarketOS
 
 on:
-  push:
-  workflow_dispatch:
+workflow_dispatch:
+push:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+build:
+runs-on: ubuntu-latest
 
-    steps:
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y git python3 python3-pip kpartx qemu-user-static sudo
+steps:
+  - name: Checkout repo
+    uses: actions/checkout@v4
 
-    - name: Clone pmbootstrap
-      run: |
-        git clone https://gitlab.postmarketos.org/postmarketOS/pmbootstrap.git
-        cd pmbootstrap
-        ./pmbootstrap.py --version
+  - name: Install dependencies
+    run: |
+      sudo apt update
+      sudo apt install -y git python3 python3-pip kpartx qemu-user-static sudo
 
-    - name: Initialize pmbootstrap
-      run: |
-        cd pmbootstrap
-        printf "\n\n\n\n\n\n\n" | ./pmbootstrap.py init
+  - name: Clone pmbootstrap
+    run: |
+      git clone https://gitlab.postmarketos.org/postmarketOS/pmbootstrap.git
+      cd pmbootstrap
+      ./pmbootstrap.py --version
 
-    - name: Configure build
-      run: |
-        cd pmbootstrap
-        ./pmbootstrap.py config device a2corelte
-        ./pmbootstrap.py config arch armv7
-        ./pmbootstrap.py config ui none
-        ./pmbootstrap.py config extra_packages "vim python3 python3-pip nodejs gcc"
+  - name: Initialize pmbootstrap
+    run: |
+      cd pmbootstrap
+      ./pmbootstrap.py init --auto
 
-    - name: Build image
-      run: |
-        cd pmbootstrap
-        ./pmbootstrap.py install --no-interactive
+  - name: Configure build
+    run: |
+      cd pmbootstrap
+      ./pmbootstrap.py config device a2corelte
+      ./pmbootstrap.py config arch armv7
+      ./pmbootstrap.py config ui console
+      ./pmbootstrap.py config extra_packages "vim python3 python3-pip nodejs gcc"
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: pmos-build
-        path: ~/.local/var/pmbootstrap
+  - name: Build image
+    run: |
+      cd pmbootstrap
+      ./pmbootstrap.py install --no-interactive
+
+  - name: Upload artifact
+    uses: actions/upload-artifact@v4
+    with:
+      name: postmarketos-build
+      path: ~/.local/var/pmbootstrap
