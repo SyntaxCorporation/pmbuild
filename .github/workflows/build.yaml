@@ -13,15 +13,14 @@ jobs:
       options: --privileged
 
     steps:
-      - name: Install base tools
+      - name: Install system dependencies
         run: |
           apt update
-          apt install -y git sudo python3 python3-pip kpartx qemu-user-static wget
+          apt install -y git python3 python3-pip sudo kpartx qemu-user-static
 
-      - name: Clone repository
+      - name: Install python dependencies
         run: |
-          git clone https://github.com/${{ github.repository }} repo
-          cd repo
+          pip3 install tomli
 
       - name: Clone pmbootstrap
         run: |
@@ -45,7 +44,7 @@ jobs:
           cd pmbootstrap
           ./pmbootstrap.py -w /work install --no-interactive
 
-      - name: Upload build
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: postmarketos-image
