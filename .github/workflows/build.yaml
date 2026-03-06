@@ -8,14 +8,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    container:
+      image: ubuntu:22.04
+      options: --privileged
 
-      - name: Install dependencies
+    steps:
+      - name: Install base tools
         run: |
-          sudo apt update
-          sudo apt install -y git python3 python3-pip kpartx qemu-user-static sudo
+          apt update
+          apt install -y git sudo python3 python3-pip kpartx qemu-user-static wget
+
+      - name: Clone repository
+        run: |
+          git clone https://github.com/${{ github.repository }} repo
+          cd repo
 
       - name: Clone pmbootstrap
         run: |
@@ -24,23 +30,23 @@ jobs:
       - name: Initialize pmbootstrap
         run: |
           cd pmbootstrap
-          printf "edge\nsamsung\na2corelte\nstable\nuser\n" | ./pmbootstrap.py init
+          printf "edge\nsamsung\na2corelte\nstable\nuser\n" | ./pmbootstrap.py -w /work init
 
       - name: Configure build
         run: |
           cd pmbootstrap
-          ./pmbootstrap.py config device a2corelte
-          ./pmbootstrap.py config arch armv7
-          ./pmbootstrap.py config ui console
-          ./pmbootstrap.py config extra_packages "vim python3 python3-pip nodejs gcc"
+          ./pmbootstrap.py -w /work config device a2corelte
+          ./pmbootstrap.py -w /work config arch armv7
+          ./pmbootstrap.py -w /work config ui console
+          ./pmbootstrap.py -w /work config extra_packages "vim python3 python3-pip nodejs gcc"
 
       - name: Build image
         run: |
           cd pmbootstrap
-          ./pmbootstrap.py install --no-interactive
+          ./pmbootstrap.py -w /work install --no-interactive
 
-      - name: Upload build artifact
+      - name: Upload build
         uses: actions/upload-artifact@v4
         with:
           name: postmarketos-image
-          path: /home/runner/.local/var/pmbootstrap
+          path: /work
