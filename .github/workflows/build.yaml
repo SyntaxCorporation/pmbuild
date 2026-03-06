@@ -1,6 +1,5 @@
-name: Build postmarketOS (a2corelte, armv7, console)
+name: pmos-build
 
-# Manual trigger or on push
 on:
   workflow_dispatch:
   push:
@@ -11,76 +10,43 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install system packages
+      - name: Install packages
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-            git python3 python3-pip kpartx qemu-user-static qemu-utils \
-            bmap-tools binfmt-support squashfs-tools mtools e2fsprogs \
-            build-essential fakeroot ca-certificates
-
-      - name: Install Python deps (user)
-        run: |
-          python3 -m pip install --user tomli
-
-      - name: Ensure local bin is in PATH
-        run: |
-          echo "PATH=\$HOME/.local/bin:\$PATH" >> $GITHUB_ENV
-          export PATH=$HOME/.local/bin:$PATH
-          which pmbootstrap || true
+          sudo apt update
+          sudo apt install -y git python3 python3-pip qemu-user-static qemu-utils kpartx sudo
+          pip3 install --user tomli
 
       - name: Clone pmbootstrap
         run: |
           git clone https://gitlab.postmarketos.org/postmarketOS/pmbootstrap.git
 
-      - name: Initialize pmbootstrap (non-interactive)
-        env:
-          PMBOOT_WORK: /home/runner/pmos-work
+      - name: Init pmbootstrap
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          mkdir -p /home/runner/pmos-work
+          cd pmbootstrap
+          printf "edge\nsamsung\na2corelte\nstable\nuser\n\n" | ./pmbootstrap.py -w /home/runner/pmos-work init
+
+      - name: Configure device
         run: |
           export PATH=$HOME/.local/bin:$PATH
           cd pmbootstrap
-          # Provide answers to all interactive prompts. Adjust lines if pmbootstrap's prompts change.
-          printf "edge\nsamsung\na2corelte\nstable\nuser\n\n" | ./pmbootstrap.py -w "$PMBOOT_WORK" init
+          ./pmbootstrap.py -w /home/runner/pmos-work config device a2corelte
+          ./pmbootstrap.py -w /home/runner/pmos-work config arch armv7
+          ./pmbootstrap.py -w /home/runner/pmos-work config ui console
+          ./pmbootstrap.py -w /home/runner/pmos-work config extra_packages "vim python3 python3-pip nodejs gcc"
 
-      - name: Configure pmbootstrap (device, arch, UI, extra packages)
-        env:
-          PMBOOT_WORK: /home/runner/pmos-work
+      - name: Build image
         run: |
           export PATH=$HOME/.local/bin:$PATH
           cd pmbootstrap
-          ./pmbootstrap.py -w "$PMBOOT_WORK" config device a2corelte
-          ./pmbootstrap.py -w "$PMBOOT_WORK" config arch armv7
-          ./pmbootstrap.py -w "$PMBOOT_WORK" config ui console
-          ./pmbootstrap.py -w "$PMBOOT_WORK" config extra_packages "vim python3 python3-pip nodejs gcc"
+          ./pmbootstrap.py -w /home/runner/pmos-work install --no-interactive --filesystem ext4
 
-      - name: Build root filesystem (safe mode: ext4 rootfs to avoid loop/device issues)
-        env:
-          PMBOOT_WORK: /home/runner/pmos-work
-        run: |
-          export PATH=$HOME/.local/bin:$PATH
-          cd pmbootstrap
-          # Use ext4 filesystem image (avoids many loop/device problems on CI)
-          ./pmbootstrap.py -w "$PMBOOT_WORK" install --no-interactive --filesystem ext4
-
-      - name: Export / collect outputs
-        env:
-          PMBOOT_WORK: /home/runner/pmos-work
-        run: |
-          export PATH=$HOME/.local/bin:$PATH
-          cd pmbootstrap
-          # create a small manifest so you know what was built
-          mkdir -p "$PMBOOT_WORK/artifacts"
-          ls -lah "$PMBOOT_WORK" > "$PMBOOT_WORK/artifacts/pmos-work-tree.txt" || true
-          # try pmbootstrap export (will place images in work path if available)
-          ./pmbootstrap.py -w "$PMBOOT_WORK" export || true
-          # copy any images/rootfs into artifacts
-          cp -a "$PMBOOT_WORK"/* "$PMBOOT_WORK/artifacts/" || true
-
-      - name: Upload build artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: postmarketos-a2corelte-armv7-console
-          path: /home/runner/pmos-work/artifacts
+          name: pmos-image
+          path: /home/runner/pmos-work
