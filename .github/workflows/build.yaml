@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install dependencies
@@ -20,15 +20,13 @@ jobs:
       - name: Clone pmbootstrap
         run: |
           git clone https://gitlab.postmarketos.org/postmarketOS/pmbootstrap.git
-          cd pmbootstrap
-          ./pmbootstrap.py --version
 
       - name: Initialize pmbootstrap
         run: |
           cd pmbootstrap
-          ./pmbootstrap.py init --auto
+          printf "edge\nsamsung\na2corelte\nstable\nuser\n" | ./pmbootstrap.py init
 
-      - name: Configure device
+      - name: Configure build
         run: |
           cd pmbootstrap
           ./pmbootstrap.py config device a2corelte
@@ -41,8 +39,8 @@ jobs:
           cd pmbootstrap
           ./pmbootstrap.py install --no-interactive
 
-      - name: Upload artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: pmos-image
-          path: ~/.local/var/pmbootstrap
+          name: postmarketos-image
+          path: /home/runner/.local/var/pmbootstrap
