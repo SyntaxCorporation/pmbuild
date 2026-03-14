@@ -28,8 +28,8 @@ jobs:
         cd pmbootstrap
 
         printf "%s\n" \
-        "/home/runner/.local/var/pmbootstrap" \
-        "/home/runner/.local/var/pmbootstrap/cache_git/pmaports" \
+        "/home/user/.local/var/pmbootstrap" \
+        "/home/user/.local/var/pmbootstrap/cache_git/pmaports" \
         "edge" \
         "samsung" \
         "a2corelte" \
@@ -60,15 +60,14 @@ jobs:
 
         python3 pmbootstrap.py flash flash_kernel --export
         ls -R ~/pmbootstrap-export/
-        
-    - name: Collect Image
-      run: |
-        mkdir pmos
-        cp -r ~/.local/var/pmbootstrap/chroot_native/home/pmos/rootfs/* pmos/
-        cp -r ~/pmbootstrap-export/boot.img/* pmos/
-
-    - name: Upload build
+      
+    - name: Upload pmOS images
       uses: actions/upload-artifact@v4
       with:
-        name: postmarketos-build
-        path: pmos/
+        name: pmos-images
+        path: |
+          ~/.local/var/pmbootstrap/chroot_native/home/pmos/rootfs/samsung-a2corelte.img
+          ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot/boot.img
+          ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot/vmlinuz
+          ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot/initramfs
+          ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot/dtbs/
