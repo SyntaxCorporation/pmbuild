@@ -51,7 +51,7 @@ jobs:
     - name: Build system
       run: |
         cd pmbootstrap
-        python3 pmbootstrap.py install --password 1234 --no-ccache
+        python3 pmbootstrap.py install --password 1234
     
     - name: Show Built Files
       run: |
