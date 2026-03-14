@@ -2,6 +2,9 @@ name: Build postmarketOS Image
 
 on:
   workflow_dispatch:
+  push:
+    branch:
+      - main
 
 jobs:
   build:
