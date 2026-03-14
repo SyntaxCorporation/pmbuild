@@ -57,9 +57,8 @@ jobs:
       run: |
         ls -R ~/.local/var/pmbootstrap/chroot_native/home/pmos/rootfs
         ls -R ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot
-
+        
         python3 pmbootstrap.py flash flash_kernel --export
-        ls -R ~/pmbootstrap-export/
       
     - name: Upload pmOS images
       uses: actions/upload-artifact@v4
