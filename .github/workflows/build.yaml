@@ -55,15 +55,20 @@ jobs:
     
     - name: Show Built Files
       run: |
-        ls -R ~/.local/var/pmbootstrap/packages/
+        ls -R ~/.local/var/pmbootstrap/chroot_native/home/pmos/rootfs
+				ls -R ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot
+
+				python3 pmbootstrap.py flash flash_kernel --export
+				ls -R ~/pmbootstrap-export/
         
     - name: Collect Image
       run: |
-        mkdir output
-        cp -r ~/.local/var/pmbootstrap/packages/* output/
+        mkdir pmos
+        cp -r ~/.local/var/pmbootstrap/chroot_native/home/pmos/rootfs/* pmos/
+        cp -r ~/pmbootstrap-export/boot.img/* pmos/
 
     - name: Upload build
       uses: actions/upload-artifact@v4
       with:
         name: postmarketos-build
-        path: output
+        path: pmos/
