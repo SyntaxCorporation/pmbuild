@@ -51,7 +51,7 @@ jobs:
     - name: Build system
       run: |
         cd pmbootstrap
-        python3 pmbootstrap.py install --no-interactive
+        python3 pmbootstrap.py install
 
     - name: Upload build
       uses: actions/upload-artifact@v4
