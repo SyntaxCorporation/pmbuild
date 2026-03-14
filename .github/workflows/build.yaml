@@ -1,0 +1,57 @@
+name: Build postmarketOS Image
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y git python3 python3-venv build-essential qemu-user-static binfmt-support kpartx util-linux parted e2fsprogs rsync bzip2 xz-utils
+
+    - name: Clone pmbootstrap
+      run: |
+        git clone https://gitlab.postmarketos.org/postmarketOS/pmbootstrap.git
+
+    - name: Initialize pmbootstrap
+      run: |
+        cd pmbootstrap
+
+        printf "%s\n" \
+        "/home/runner/.local/var/pmbootstrap" \
+        "/home/runner/.local/var/pmbootstrap/cache_git/pmaports" \
+        "edge" \
+        "samsung" \
+        "a2corelte" \
+        "runner" \
+        "" \
+        "" \
+        "" \
+        "console" \
+        "default" \
+        "n" \
+        "python3,python3-pip,git,vim,gcc" \
+        "n" \
+        "en_US" \
+        "n" \
+        "y" \
+        "y" \
+        | python3 pmbootstrap.py init
+
+    - name: Build system
+      run: |
+        cd pmbootstrap
+        python3 pmbootstrap.py install --no-interactive
+
+    - name: Upload build
+      uses: actions/upload-artifact@v4
+      with:
+        name: postmarketos-build
+        path: /home/runner/.local/var/pmbootstrap
