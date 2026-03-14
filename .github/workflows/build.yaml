@@ -55,7 +55,7 @@ jobs:
     
     - name: Show Built Files
       run: |
-        ls -R ~/.local/var/pmbootstrap/images
+        ls -R ~/.local/var/pmbootstrap
         
     - name: Collect Image
       run: |
