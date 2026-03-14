@@ -28,8 +28,8 @@ jobs:
         cd pmbootstrap
 
         printf "%s\n" \
-        "/home/user/.local/var/pmbootstrap" \
-        "/home/user/.local/var/pmbootstrap/cache_git/pmaports" \
+        "/home/runner/.local/var/pmbootstrap" \
+        "/home/runner/.local/var/pmbootstrap/cache_git/pmaports" \
         "edge" \
         "samsung" \
         "a2corelte" \
@@ -68,6 +68,7 @@ jobs:
         path: |
           ~/.local/var/pmbootstrap/chroot_native/home/pmos/rootfs/samsung-a2corelte.img
           ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot/boot.img
+          ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot/dt.img
           ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot/vmlinuz
           ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot/initramfs
           ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot/dtbs/
