@@ -33,7 +33,7 @@ jobs:
         "edge" \
         "samsung" \
         "a2corelte" \
-        "runner" \
+        "user" \
         "" \
         "" \
         "" \
@@ -51,10 +51,19 @@ jobs:
     - name: Build system
       run: |
         cd pmbootstrap
-        python3 pmbootstrap.py install --password 1234
+        python3 pmbootstrap.py install --password 1234 --no-ccache
+    
+    - name: Show Built Files
+      run: |
+        ls -R ~/.local/var/pmbootstrap/images
+        
+    - name: Collect Image
+      run: |
+        mkdir output
+        cp -r ~/.local/var/pmbootstrap/images/* output/
 
     - name: Upload build
       uses: actions/upload-artifact@v4
       with:
         name: postmarketos-build
-        path: /home/runner/.local/var/pmbootstrap
+        path: output
