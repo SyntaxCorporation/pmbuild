@@ -55,12 +55,12 @@ jobs:
     
     - name: Show Built Files
       run: |
-        ls -R ~/.local/var/pmbootstrap
+        ls -R ~/.local/var/pmbootstrap/packages/
         
     - name: Collect Image
       run: |
         mkdir output
-        cp -r ~/.local/var/pmbootstrap/images/* output/
+        cp -r ~/.local/var/pmbootstrap/packages/* output/
 
     - name: Upload build
       uses: actions/upload-artifact@v4
