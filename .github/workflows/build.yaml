@@ -56,10 +56,10 @@ jobs:
     - name: Show Built Files
       run: |
         ls -R ~/.local/var/pmbootstrap/chroot_native/home/pmos/rootfs
-				ls -R ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot
+        ls -R ~/.local/var/pmbootstrap/chroot_rootfs_samsung-a2corelte/boot
 
-				python3 pmbootstrap.py flash flash_kernel --export
-				ls -R ~/pmbootstrap-export/
+        python3 pmbootstrap.py flash flash_kernel --export
+        ls -R ~/pmbootstrap-export/
         
     - name: Collect Image
       run: |
